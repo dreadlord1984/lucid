@@ -14,11 +14,22 @@
 Lucid is a collection of infrastructure and tools for research in neural
 network interpretability.
 
-In particular, it provides state of the art implementations of [feature
-visualization techniques](https://distill.pub/2017/feature-visualization/),
-and flexible abstractions that make it very easy to explore new research
-directions.
+**We're not currently supporting tensorflow 2!**
 
+If you'd like to use lucid in colab which defaults to tensorflow 2, add this magic to a cell before you import tensorflow:
+
+```%tensorflow_version 1.x```
+
+**Lucid is research code, not production code. We provide no guarantee it will work for your use case. Lucid is maintained by volunteers who are unable to provide significant technical support.**
+
+* [📓 **Notebooks**](#notebooks) -- Get started without any setup!
+* [📚 **Reading**](#recomended-reading) -- Learn more about visualizing neural nets.
+* [💬 **Community**](#community) -- Want to get involved? Please reach out!
+* [🔧 **Additional Information**](#additional-information) -- Licensing, code style, etc.
+* [🔬 **Start Doing Research!**](https://github.com/tensorflow/lucid/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aresearch) -- Want to get involved? We're trying to research openly!
+* [📦 **Visualize your own model**](https://github.com/tensorflow/lucid/wiki/Importing-Models-into-Lucid) -- How to import your own model for visualization
+
+<br>
 
 # Notebooks
 
@@ -111,6 +122,26 @@ You can run the notebooks on your local machine, too. Clone the repository and f
 <img src="https://storage.googleapis.com/lucid-static/differentiable-parameterizations/stickers/colab-3d-style.png" width="500" alt=""></img>
 </a>
 
+<br>
+
+## Activation Atlas Notebooks
+*Notebooks corresponding to the [Activation Atlas](https://distill.pub/2019/activation-atlas/) article*
+
+<a href="https://colab.research.google.com/github/tensorflow/lucid/blob/master/notebooks/activation-atlas/activation-atlas-collect.ipynb">
+<img src="https://storage.googleapis.com/modelzoo/tmp/activation-atlas/stickers/lucid-notebook-1-collect.png" width="500" alt="Collecting activations"></img>
+</a>
+
+<a href="https://colab.research.google.com/github/tensorflow/lucid/blob/master/notebooks/activation-atlas/activation-atlas-simple.ipynb">
+<img src="https://storage.googleapis.com/modelzoo/tmp/activation-atlas/stickers/lucid-notebook-2-atlas.png" width="500" alt="Simple activation atlas"></img>
+</a>
+
+<a href="https://colab.research.google.com/github/tensorflow/lucid/blob/master/notebooks/activation-atlas/class-activation-atlas.ipynb">
+<img src="https://storage.googleapis.com/modelzoo/tmp/activation-atlas/stickers/lucid-notebook-3-class-atlas.png" width="500" alt="Class activation atlas"></img>
+</a>
+
+<a href="https://colab.research.google.com/github/tensorflow/lucid/blob/master/notebooks/activation-atlas/activation-atlas-adversarial.ipynb">
+<img src="https://storage.googleapis.com/modelzoo/tmp/activation-atlas/stickers/lucid-notebook-4-patches.png" width="500" alt="Activation atlas patches"></img>
+</a>
 
 ## Miscellaneous Notebooks
 
@@ -122,6 +153,8 @@ You can run the notebooks on your local machine, too. Clone the repository and f
 <img src="https://storage.googleapis.com/lucid-static/misc/stickers/colab-interaction-grid.png" width="500" alt=""></img>
 </a>
 
+<br> 
+
 # Recomended Reading
 
 * [Feature Visualization](https://distill.pub/2017/feature-visualization/)
@@ -129,12 +162,18 @@ You can run the notebooks on your local machine, too. Clone the repository and f
 * [Using Artiﬁcial Intelligence to Augment Human Intelligence](https://distill.pub/2017/aia/)
 * [Visualizing Representations: Deep Learning and Human Beings](http://colah.github.io/posts/2015-01-Visualizing-Representations/)
 * [Differentiable Image Parameterizations](https://distill.pub/2018/differentiable-parameterizations/)
+* [Activation Atlas](https://distill.pub/2019/activation-atlas/)
 
 ## Related Talks
 * [Lessons from a year of Distill ML Research](https://www.youtube.com/watch?v=jlZsgUZaIyY) (Shan Carter, OpenVisConf)
 * [Machine Learning for Visualization](https://www.youtube.com/watch?v=6n-kCYn0zxU) (Ian Johnson, OpenVisConf)
 
-<br>
+# Community
+
+We're in `#proj-lucid` on the Distill slack ([join link](http://slack.distill.pub)).
+
+We'd love to see more people doing research in this space!
+
 <br>
 
 # Additional Information
@@ -152,40 +191,3 @@ Lucid requires `tensorflow`, but does not explicitly depend on it in `setup.py`.
 If you don't want to add your own dependency on tensorflow, you can specify which tensorflow version you want lucid to install by selecting from `extras_require` like so: `lucid[tf]` or `lucid[tf_gpu]`.
 
 **In actual practice, we recommend you use your already installed version of tensorflow.**
-
-## Development
-
-### Style guide deviations
-
-We use naming conventions to help differentiate tensors, operations, and values:
-
-* Suffix variable names representing **tensors** with `_t`
-* Suffix variable names representing **operations** with `_op`
-* Don't suffix variable names representing concrete values
-
-Usage example:
-
-```
-global_step_t = tf.train.get_or_create_global_step()
-global_step_init_op = tf.variables_initializer([global_step_t])
-global_step = global_step_t.eval()
-```
-
-### Running Tests
-
-Use `tox` to run the test suite in both Python 2 and Python 3 environments.
-
-To also run slower integration tests (marked with `pytest.mark.slow`), specify the `--run-slow` option for pytest, which can be passed through `tox` like so:
-
-```
-tox -- --run-slow
-```
-
-To run tests only for a specific module, pass a folder to `tox`:
-`tox tests/misc/io`
-
-To run tests only in a specific environment, pass the environment's identifier
-via the `-e` flag: `tox -e py27`.
-
-After adding dependencies to `setup.py`, run tox with the `--recreate` flag to
-update the environments' dependencies.

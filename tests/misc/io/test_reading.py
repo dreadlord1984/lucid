@@ -10,7 +10,7 @@ import io
 
 path = "./tests/fixtures/string.txt"
 string = u"The quick brown fox jumps over the lazy 🐕"
-io.open(path, 'w').write(string)
+io.open(path, 'w', encoding="utf-8").write(string)
 
 
 def test_read_txt_file():
@@ -42,7 +42,7 @@ def test_read_binary_file():
 def test_read_remote_url(mocker):
   path = "https://example.com/example.html"
   golden = b"42"
-  mock_urlopen = mocker.patch('future.moves.urllib.request.urlopen',
+  mock_urlopen = mocker.patch('urllib.request.urlopen',
     return_value=io.BytesIO(golden))
 
   content = read(path, cache=False)

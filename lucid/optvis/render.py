@@ -44,15 +44,15 @@ log = logging.getLogger(__name__)
 def render_vis(model, objective_f, param_f=None, optimizer=None,
                transforms=None, thresholds=(512,), print_objectives=None,
                verbose=True, relu_gradient_override=True, use_fixed_seed=False):
-  """Flexible optimization-base feature vis.
+  """Flexible optimization-based feature vis.
 
-  There's a lot of ways one might wish to customize otpimization-based
+  There's a lot of ways one might wish to customize optimization-based
   feature visualization. It's hard to create an abstraction that stands up
   to all the things one might wish to try.
 
   This function probably can't do *everything* you want, but it's much more
   flexible than a naive attempt. The basic abstraction is to split the problem
-  into several parts. Consider the rguments:
+  into several parts. Consider the arguments:
 
   Args:
     model: The model to be visualized, from Alex' modelzoo.
@@ -79,6 +79,7 @@ def render_vis(model, objective_f, param_f=None, optimizer=None,
     use_fixed_seed: Seed the RNG with a fixed value so results are reproducible.
       Off by default. As of tf 1.8 this does not work as intended, see:
       https://github.com/tensorflow/tensorflow/issues/9171
+
   Returns:
     2D array of optimization results containing of evaluations of supplied
     param_f snapshotted at specified thresholds. Usually that will mean one or
@@ -108,7 +109,7 @@ def render_vis(model, objective_f, param_f=None, optimizer=None,
             print_objective_func(sess)
             show(np.hstack(vis))
     except KeyboardInterrupt:
-      log.warn("Interrupted optimization at step {:d}.".format(i+1))
+      log.warning("Interrupted optimization at step {:d}.".format(i+1))
       vis = t_image.eval()
       show(np.hstack(vis))
 
@@ -249,13 +250,15 @@ def make_optimizer(optimizer, args):
            "optimizer, or tf.train.Optimizer instance.")
 
 
-def import_model(model, t_image, t_image_raw):
+def import_model(model, t_image, t_image_raw=None, scope="import", input_map=None):
+  if t_image_raw is None:
+    t_image_raw = t_image
 
-  model.import_graph(t_image, scope="import", forget_xy_shape=True)
+  T_ = model.import_graph(t_image, scope=scope, forget_xy_shape=True, input_map=input_map)
 
   def T(layer):
     if layer == "input": return t_image_raw
     if layer == "labels": return model.labels
-    return t_image.graph.get_tensor_by_name("import/%s:0"%layer)
+    return T_(layer)
 
   return T

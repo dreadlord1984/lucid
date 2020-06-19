@@ -9,3 +9,19 @@ notebooks/.ipynb_checkpoints
 coverage.txt
 .coverage
 lucidenv
+lucid-env
+.idea
+.vscode
+.mypy_cache
+
+pip-selfcheck.json
+
+.DS_Store
+
+# virtual envs
+bin
+include
+lib
+share
+
+tests/fixtures/generated_outputs/

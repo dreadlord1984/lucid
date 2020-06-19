@@ -6,6 +6,7 @@ import tensorflow as tf
 
 from lucid.modelzoo.nets_factory import models_map, get_model
 from lucid.modelzoo import caffe_models, other_models, slim_models, vision_models
+from lucid.modelzoo.vision_base import Layer
 
 
 clean_modules = [
@@ -24,7 +25,8 @@ forbidden_names = [
     "division",
     "print_function",
     "IMAGENET_MEAN",
-    "IMAGENET_MEAN_BGR"
+    "IMAGENET_MEAN_BGR",
+    "_layers_from_list_of_dicts"
 ]
 
 
@@ -40,9 +42,10 @@ def test_consistent_namespaces():
     exported_model_names = set(dir(vision_models))
     diffs = model_names.symmetric_difference(exported_model_names)
     for difference in diffs:
-        assert difference == 'Model' or difference.startswith("__")
+        assert difference in ('Model', 'Layer') or difference.startswith("__")
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("name,model_class", models_map.items())
 def test_model_properties(name, model_class):
     assert hasattr(model_class, "model_path")
@@ -55,17 +58,25 @@ def test_model_properties(name, model_class):
     assert hasattr(model_class, "image_value_range")
     assert hasattr(model_class, "input_name")
     assert hasattr(model_class, "layers")
+    assert len(model_class.layers) > 0
+    last_layer = model_class.layers[-1]
+    assert 'dense' in last_layer.tags
+    assert type(last_layer) == Layer
+    assert last_layer.model_class == model_class
+    model_instance = model_class()
+    assert model_instance.name == model_class.__name__
+    assert last_layer.model_name == model_instance.name
 
 @pytest.mark.slow
-@pytest.mark.parametrize("name,model_class", models_map.items())
-def test_model_layers_shapes(name, model_class):
+@pytest.mark.parametrize("model_class", models_map.values())
+def test_model_layers_shapes(model_class):
+    name = model_class.__name__
     scope = "TestLucidModelzoo"
     model = model_class()
-    model.load_graphdef()
     with tf.Graph().as_default() as graph:
         model.import_graph(scope=scope)
         for layer in model.layers:
-            name, declared_size = (layer[key] for key in ("name", "size"))
+            name, declared_size = layer.name, layer.depth
             imported_name = "{}/{}:0".format(scope, name)
             tensor = graph.get_tensor_by_name(imported_name)
             actual_size = tensor.shape[-1]

@@ -14,7 +14,7 @@
 # ==============================================================================
 
 from __future__ import absolute_import, division, print_function
-from lucid.modelzoo.vision_base import Model, IMAGENET_MEAN_BGR
+from lucid.modelzoo.vision_base import Model, _layers_from_list_of_dicts, IMAGENET_MEAN_BGR
 
 
 class AlexNet(Model):
@@ -34,17 +34,23 @@ class AlexNet(Model):
   # but it seems more polite and reliable to host our own.
   model_path  = 'gs://modelzoo/vision/other_models/AlexNet.pb'
   labels_path = 'gs://modelzoo/labels/ImageNet_standard.txt'
+  synsets_path = 'gs://modelzoo/labels/ImageNet_standard_synsets.txt'
   dataset = 'ImageNet'
   image_shape = [227, 227, 3]
   is_BGR = True
   image_value_range = (-IMAGENET_MEAN_BGR, 255-IMAGENET_MEAN_BGR)
   input_name = 'Placeholder'
 
-  # TODO - Sanity check this graph and layers
-  layers = [
-     {'type': 'conv', 'name': 'concat_2', 'size': 256},
-     {'type': 'conv', 'name': 'conv5_1', 'size': 256},
-     {'type': 'dense', 'name': 'Relu', 'size': 4096},
-     {'type': 'dense', 'name': 'Relu_1', 'size': 4096},
-     {'type': 'dense', 'name': 'Softmax', 'size': 1000},
-   ]
+AlexNet.layers = _layers_from_list_of_dicts(AlexNet(), [
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D', 'depth': 96},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_1', 'depth': 128},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_2', 'depth': 128},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_3', 'depth': 384},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_4', 'depth': 192},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_5', 'depth': 192},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_6', 'depth': 128},
+  {'tags': ['pre_relu', 'conv'], 'name': 'Conv2D_7', 'depth': 128},
+  {'tags': ['dense'], 'name': 'Relu', 'depth': 4096},
+  {'tags': ['dense'], 'name': 'Relu_1', 'depth': 4096},
+  {'tags': ['dense'], 'name': 'Softmax', 'depth': 1000},
+])
